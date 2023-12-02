@@ -1,0 +1,104 @@
+# SVReg Version: 23a
+# SVReg Build: 2422
+# Atlas Name: BrainSuiteAtlas1
+0	background
+120	R. superior frontal gyrus
+121	L. superior frontal gyrus
+130	R. middle frontal gyrus
+131	L. middle frontal gyrus
+142	R. pars opercularis
+143	L. pars opercularis
+144	R. pars triangularis
+145	L. pars triangularis
+146	R. pars orbitalis
+147	L. pars orbitalis
+150	R. pre-central gyrus
+151	L. pre-central gyrus
+162	R. transvers frontal gyrus
+163	L. transvers frontal gyrus
+164	R. gyrus rectus
+165	L. gyrus rectus
+166	R. middle orbito-frontal gyrus
+167	L. middle orbito-frontal gyrus
+168	R. anterior orbito-frontal gyrus
+169	L. anterior orbito-frontal gyrus
+170	R. posterior orbito-frontal gyrus
+171	L. posterior orbito-frontal gyrus
+172	R. lateral orbitofrontal gyrus
+173	L. lateral orbitofrontal gyrus
+182	R. paracentral lobule
+183	L. paracentral lobule
+184	R. cingulate gyrus
+185	L. cingulate gyrus
+186	R. subcallosal gyrus
+187	L. subcallosal gyrus
+222	R. post-central gyrus
+223	L. post-central gyrus
+224	R. supramarginal gyrus
+225	L. supramarginal gyrus
+226	R. angular gyrus
+227	L. angular gyrus
+228	R. superior parietal gyrus
+229	L. superior parietal gyrus
+242	R. pre-cuneus
+243	L. pre-cuneus
+310	R. temporal pole
+311	L. temporal pole
+322	R. superior temporal gyrus
+323	L. superior temporal gyrus
+324	R. transverse temporal gyrus
+325	L. transverse temporal gyrus
+326	R. middle temporal gyrus
+327	L. middle temporal gyrus
+328	R. inferior temporal gyrus
+329	L. inferior temporal gyrus
+330	R. fusiforme gyrus
+331	L. fusiforme gyrus
+342	R. parahippocampal gyrus
+343	L. parahippocampal gyrus
+344	R. hippocampus
+345	L. hippocampus
+346	R. amygdala
+347	L. amygdala
+422	R. superior occipital gyrus
+423	L. superior occipital gyrus
+424	R. middle occipital gyrus
+425	L. middle occipital gyrus
+442	R. inferior occipital gyrus
+443	L. inferior occipital gyrus
+444	R. lingual gyrus
+445	L. lingual gyrus
+446	R. cuneus
+447	L. cuneus
+500	R. Insula
+501	L. Insula
+612	R. caudate nucleus
+613	L. caudate nucleus
+614	R. putamen
+615	L. putamen
+616	R. globus pallidus
+617	L. globus pallidus
+620	R. nucleus accumbens
+621	L. nucleus accumbens
+630	R. claustrum
+631	L. claustrum
+640	R. thalamus
+641	L. thalamus
+650	R. basal forebrain
+651	L. basal forebrain
+660	R. lateral geniculate nucleus
+661	L. lateral geniculate nucleus
+662	R. medial geniculate nucleus
+663	L. medial geniculate nucleus
+670	R. superior colliculus
+671	L. superior colliculus
+680	R. inferior colliculus
+681	L. inferior colliculus
+690	R. mamillary body
+691	L. mamillary body
+701	L. Ventricular System
+720	R. lateral ventricle
+740	third ventricle
+800	Brainstem
+900	Cerebellum
+2000	White matter (cerebrum)

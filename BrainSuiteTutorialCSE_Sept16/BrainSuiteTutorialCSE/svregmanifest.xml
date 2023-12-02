@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svregmanifest>
+	<version>23a</version>
+	<build>2422</build>
+	<date>2023-07-17</date>
+	<mcrversion>9.14</mcrversion>
+	<minimumbrainsuiteversion>14a</minimumbrainsuiteversion>
+	<platform>win64</platform>
+	<atlas>BrainSuiteAtlas1</atlas>
+	<atlas basename="BCI-DNI_brain">BCI-DNI_brain_atlas</atlas>
+	<atlas basename="USCBrain">USCBrain</atlas>
+</svregmanifest>

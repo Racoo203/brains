@@ -1,0 +1,9 @@
+19-Nov-2023 21:31:12:SVReg 23a(2422):svreg_label_surf_hemi C:\Users\Raul\OneDrive\Escritorio\Reto FISMAT\BrainSuiteTutorialCSE_Sept16\BrainSuiteTutorialCSE\2523412 C:\Program Files\BrainSuite23a\svreg\BrainSuiteAtlas1\mri right -v1 
+19-Nov-2023 21:31:16:SVReg 23a(2422):svreg_label_surf_hemi C:\Users\Raul\OneDrive\Escritorio\Reto FISMAT\BrainSuiteTutorialCSE_Sept16\BrainSuiteTutorialCSE\2523412 C:\Program Files\BrainSuite23a\svreg\BrainSuiteAtlas1\mri left -v1 
+19-Nov-2023 21:41:36:19-Nov-2023 21:41:36:SVReg 23a(2422):volmap_ball C:\Users\Raul\OneDrive\Escritorio\Reto FISMAT\BrainSuiteTutorialCSE_Sept16\BrainSuiteTutorialCSE\2523412.target 1 -v1 
+SVReg 23a(2422):volmap_ball C:\Users\Raul\OneDrive\Escritorio\Reto FISMAT\BrainSuiteTutorialCSE_Sept16\BrainSuiteTutorialCSE\2523412 1 -v1 
+19-Nov-2023 21:47:07:SVReg 23a(2422):svreg_volreg C:\Users\Raul\OneDrive\Escritorio\Reto FISMAT\BrainSuiteTutorialCSE_Sept16\BrainSuiteTutorialCSE\2523412 C:\Users\Raul\OneDrive\Escritorio\Reto FISMAT\BrainSuiteTutorialCSE_Sept16\BrainSuiteTutorialCSE\2523412.target -v1 
+19-Nov-2023 22:37:41:19-Nov-2023 22:37:41:SVReg 23a(2422):refine_ROIs2 C:\Users\Raul\OneDrive\Escritorio\Reto FISMAT\BrainSuiteTutorialCSE_Sept16\BrainSuiteTutorialCSE\2523412 right -v1 
+SVReg 23a(2422):refine_ROIs2 C:\Users\Raul\OneDrive\Escritorio\Reto FISMAT\BrainSuiteTutorialCSE_Sept16\BrainSuiteTutorialCSE\2523412 left -v1 
+19-Nov-2023 22:40:00:SVReg 23a(2422):svreg_refinements C:\Users\Raul\OneDrive\Escritorio\Reto FISMAT\BrainSuiteTutorialCSE_Sept16\BrainSuiteTutorialCSE\2523412 C:\Users\Raul\OneDrive\Escritorio\Reto FISMAT\BrainSuiteTutorialCSE_Sept16\BrainSuiteTutorialCSE\2523412.target  -v1 
+19-Nov-2023 22:43:12:SVReg 23a(2422):clean_intermediate_files C:\Users\Raul\OneDrive\Escritorio\Reto FISMAT\BrainSuiteTutorialCSE_Sept16\BrainSuiteTutorialCSE\2523412 
