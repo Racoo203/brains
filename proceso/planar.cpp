@@ -25,78 +25,31 @@ inline std::ostream &operator<<(std::ostream &os, SILT::Point3D &p) {
 typedef std::complex<double> Complex;
 
 SparseVector<Complex> CGMethod(SparseMatrix<Complex>& A, SparseVector<Complex>& b, SparseVector<Complex>& x0, double tol) {
-    std::vector<VectorXcd> x;
-    std::vector<VectorXcd> r;
-    std::vector<VectorXcd> p;
-    std::vector<double> alfa, beta;
-
-    std::vector<Complex> finalCoords;
-
-    // dimensiones de todo
-
-    // std::cout << "A dimensiones: " << A.rows() << "x" << A.cols() << std::endl;
-    // std::cout << "b dimensiones: " << b.rows() << "x" << b.cols() << std::endl;
-    // std::cout << "x0 dimensiones: " << x0.rows() << "x" << x0.cols() << std::endl;
-    int maxIterations = 10;
     b = A.transpose() * b;
-    // std::cout << "Nueva b dimensiones: " << b.rows() << "x" << b.cols() << std::endl;
-
     A = A.transpose() * A;
-    // std::cout << "Nueva A dimensiones: " << A.rows() << "x" << A.cols() << std::endl;
+
+    int maxIterations = 1000;
     
-
-    x.push_back(x0); // x0
-    r.push_back(b - A * x0); // r0
-
-    if (r[0].norm() < tol) {
-        std::cout << "Converged after 0 iterations" << std::endl;
+    Eigen::ConjugateGradient<SparseMatrix<Complex>> solver;
+    solver.compute(A);
+    if (solver.info() != Eigen::Success) {
+        std::cerr << "Solver initialization failed!" << std::endl;
         return x0;
     }
 
-    p.push_back(r[0]); // p0
+    solver.setMaxIterations(maxIterations);
+    solver.setTolerance(tol);
 
-    for (int k = 0; k < maxIterations; k++) {
-        // alfa 0
-        alfa.push_back((r[k].transpose()*r[k]).value().real() / (p[k].transpose()*A*p[k]).value().real());
-        // x 1
-        x.push_back(x[k] + alfa[k] * p[k]);
-        r.push_back(r[k] - alfa[k] * A * p[k]);
+    x0 = solver.solve(b);
 
-        if (r[k+1].norm() < tol) {
-            std::cout << "Converged after " << k+1 << " iterations" << std::endl;
-            break;
-        }
-
-        beta.push_back((r[k+1].transpose()*r[k+1]).value().real() / (r[k].transpose()*r[k]).value().real());
-        p.push_back(r[k+1] + beta[k] * p[k]);
-
-        if (k % 10 == 0) {
-            std::cout << "k = " << k << " res = " << r.back().norm() << std::endl;
-        }
+    if (solver.info() != Eigen::Success) {
+        std::cerr << "Solver failed to converge!" << std::endl;
+    } else {
+        std::cout << "Converged after " << solver.iterations() << " iterations" << std::endl;
+        std::cout << "Estimated error: " << solver.error() << std::endl;
     }
 
-    // for (int i = 0; i < x.back().size(); i++) {
-    //     if (x.back()[i] != Complex(0,0)) std::cout << x.back()[i] << std::endl;
-    // }
-
-    int splitIndex = x.back().size() / 2;
-
-    // Add each part separately
-    VectorXcd result = x.back().head(splitIndex) + x.back().tail(splitIndex);
-    int zeroCounter = 0;
-    for (int i = 0; i < result.size(); i++) {
-        if (result[i] != Complex(0,0)) {
-            std::cout << result[i] << std::endl;
-        } else zeroCounter++;
-    }
-
-    std::cout << "X dimensiones: " << x.back().rows() << "x" << x.back().cols() << std::endl;
-    std::cout << "R norma: " << r.back().norm() << std::endl;
-    std::cout << "Result dimensiones: " << result.rows() << "x" << result.cols() << std::endl;
-    std::cout << "Number of zeros: " << zeroCounter << std::endl;
-    // llenar vector finalCoords con los valores de result y con las coordenadas fijas en sus respectivos indices
-
-    return result.sparseView();
+    return x0;
 }
 
 void fixedPoints(SILT::DFSurface surface) {
@@ -145,10 +98,9 @@ void process(SILT::DFSurface surface) {
     vertexP1 << surface.vertices[p_indices[0]].x, surface.vertices[p_indices[0]].y, surface.vertices[p_indices[0]].z;
     vertexP2 << surface.vertices[p_indices[1]].x, surface.vertices[p_indices[1]].y, surface.vertices[p_indices[1]].z;
     double diameter = (vertexP1 - vertexP2).norm();
-    u_p << Complex(-diameter/2 * 10,0), Complex(diameter/2 * 10,0), Complex(0,0), Complex(0,0);
+    u_p << Complex(-diameter/2,0), Complex(diameter/2,0), Complex(0,0), Complex(0,0);
 
     for (int i = 0; i < M; ++i) {
-
         const auto& triangle = surface.triangles[i];
         Vector3d vertexA, vertexB, vertexC;
         Vector3d vecAlfa, vecBeta, vecGamma;
@@ -188,19 +140,13 @@ void process(SILT::DFSurface surface) {
                 value = Complex(mappedB[0]-mappedA[0] / sqrt(2*area), mappedB[1]-mappedA[1] / sqrt(2*area));
             }
             triplets_c.push_back(Triplet<Complex>(i, vertices_index[j], value));
-            if (i % 10000 == 0) std::cout << "i = " << i << ", j = " << j << ", value = " << value << std::endl;
+            // if (i % 10000 == 0) std::cout << "i = " << i << ", j = " << j << ", value = " << value << std::endl;
         }   
     }
 
     M_c.setFromTriplets(triplets_c.begin(), triplets_c.end());
-
-    // Extract M_cf by removing the columns corresponding to the fixed vertices
-    M_cf = M_c.block(0, 0, M, p_indices[0]).pruned();
-    M_cf.conservativeResize(M, N - 2);
-
-    // Extract M_cp by selecting only the columns corresponding to the fixed vertices
-    M_cp = M_c.block(0, p_indices[0], M, 2).pruned();
-
+    M_cf = (M_c.leftCols(p_indices[0])+M_c.middleCols(p_indices[0]+1, p_indices[1]-p_indices[0]-1)+M_c.rightCols(N-p_indices[1]-1)).pruned();
+    M_cp = (M_c-M_cf).pruned();
     // std::cout << "Si lees esto, no se rompio" << std::endl;
     // Separate real and imaginary parts for M_cf
     SparseMatrix<Complex> M_cf_real(M_cf.rows(), M_cf.cols());
@@ -302,18 +248,126 @@ void process(SILT::DFSurface surface) {
     b = -1 * (B * u_p).sparseView();
     SparseVector<Complex> mappedCoords(N);
     SparseVector<Complex> freePoints = CGMethod(A, b, u_f, 1e-3);
-    
-    mappedCoords = freePoints.head(N-2);
 
-    std::cout << "mappedCoords dimensiones: " << mappedCoords.rows() << "x" << mappedCoords.cols() << std::endl;
-    std::cout << "numero de vertices " << surface.vertices.size() << std::endl;
+    mappedCoords.insert(p_indices[0]) = u_p[0]+u_p[2];
+    mappedCoords.insert(p_indices[1]) = u_p[1]+u_p[3];
+
+    int correction = 0;
+    for (int i = 0; i < N; i++) {
+        if (i == p_indices[0] || i == p_indices[1]) {
+            correction += 1;
+            continue;
+        }
+        // if (i%10==0) std::cout << "i = " << i << std::endl;
+        mappedCoords.insert(i) = freePoints.coeff(i - correction);
+    }
+
+    for (int i = 0; i < M; i++) {
+        const auto& triangle = surface.triangles[i];
+        Vector3d vertexA, vertexB, vertexC;
+    }
+
+    SILT::DFSurface mappedBrain = surface;
+
+   for (int i = 0; i < N; i++) {
+        double X, Y;
+        X = mappedCoords.coeff(i).real();
+        Y = mappedCoords.coeff(i).imag();
+        mappedBrain.vertices[i].x = diameter*X / (1 + X*X + Y*Y);
+        mappedBrain.vertices[i].y = diameter*Y / (1 + X*X + Y*Y);
+        mappedBrain.vertices[i].z = diameter*(-1 + X*X + Y*Y) / (2*(1 + X*X + Y*Y));
+    }
+
+    SparseMatrix<Complex> M_spring(3*M,N);
+    std::vector<Triplet<Complex>> triplets_spring;
+    triplets_spring.reserve(3*M); // Assuming each triangle contributes 3 non-zero elements
+
+    for (int i=0; i < M; i++) {
+        int edgeIndex = 0;
+        const auto& triangle = surface.triangles[i];
+        Vector3d vertexA, vertexB, vertexC;
+        Vector3d oldA, oldB, oldC;
+        Vector3d vecAlfa, vecBeta, vecGamma;
+        Vector3d oldVecAlfa, oldVecBeta, oldVecGamma;
+
+        vertexA << mappedBrain.vertices[triangle.a].x, mappedBrain.vertices[triangle.a].y, mappedBrain.vertices[triangle.a].z;
+        vertexB << mappedBrain.vertices[triangle.b].x, mappedBrain.vertices[triangle.b].y, mappedBrain.vertices[triangle.b].z;
+        vertexC << mappedBrain.vertices[triangle.c].x, mappedBrain.vertices[triangle.c].y, mappedBrain.vertices[triangle.c].z;
+        
+        vecAlfa = vertexB - vertexA;
+        vecBeta = vertexC - vertexA;
+        vecGamma = vertexC - vertexB;
+
+        oldA << surface.vertices[triangle.a].x, surface.vertices[triangle.a].y, surface.vertices[triangle.a].z;
+        oldB << surface.vertices[triangle.b].x, surface.vertices[triangle.b].y, surface.vertices[triangle.b].z;
+        oldC << surface.vertices[triangle.c].x, surface.vertices[triangle.c].y, surface.vertices[triangle.c].z;
+
+        oldVecAlfa = oldB - oldA;
+        oldVecBeta = oldC - oldA;
+        oldVecGamma = oldC - oldB;
+
+        Complex edge1, edge2, edge3;
+
+        edge1 = Complex(sqrt(vecAlfa.norm()/oldVecAlfa.norm()),0);
+        edge2 = Complex(sqrt(vecBeta.norm()/oldVecBeta.norm()),0);
+        edge3 = Complex(sqrt(vecGamma.norm()/oldVecGamma.norm()),0);
+
+        triplets_spring.push_back(Triplet<Complex>(edgeIndex, triangle.a, edge1));
+        triplets_spring.push_back(Triplet<Complex>(edgeIndex+1, triangle.b, edge2));
+        triplets_spring.push_back(Triplet<Complex>(edgeIndex+2, triangle.c, edge3));
+        edgeIndex += 3;
+
+    }
+
+    M_spring.setFromTriplets(triplets_spring.begin(), triplets_spring.end());
+
+    SparseMatrix<Complex> matrix(4*M, N);
+    std::vector<Triplet<Complex>> triplets;
+    triplets.reserve(4*M); // Assuming each triangle contributes 3 non-zero elements
+
+    for (int k = 0; k < M_c.outerSize(); ++k) {
+        for (SparseMatrix<Complex>::InnerIterator it(M_c, k); it; ++it) {
+            triplets.push_back(Triplet<Complex>(it.row(), it.col(), it.value()));
+        }
+    }
+
+    // Triplets for M_spring
+    for (int k = 0; k < M_spring.outerSize(); ++k) {
+        for (SparseMatrix<Complex>::InnerIterator it(M_spring, k); it; ++it) {
+            triplets.push_back(Triplet<Complex>(M + it.row(), it.col(), it.value()));
+        }
+    }
+
+    matrix.setFromTriplets(triplets.begin(), triplets.end());
+
+    std::cout << "matrix" << std::endl;
+
+    SparseMatrix<Complex> matrix_real(matrix.rows(), matrix.cols());
+    SparseMatrix<Complex> matrix_imag(matrix.rows(), matrix.cols());
+    std::vector<Triplet<Complex>> triplets_real, triplets_imag;
+    triplets_real.reserve(4*M); // Assuming each triangle contributes 3 non-zero elements
+    triplets_imag.reserve(4*M); // Assuming each triangle contributes 3 non-zero elements
+
+    for (int k = 0; k < matrix.outerSize(); ++k) {
+        for (SparseMatrix<Complex>::InnerIterator it(matrix, k); it; ++it) {
+            triplets_real.push_back(Triplet<Complex>(it.row(), it.col(), Complex(it.value().real(), 0)));
+            triplets_imag.push_back(Triplet<Complex>(it.row(), it.col(), Complex(0, it.value().imag())));
+        }
+    }
+
+    matrix_real.setFromTriplets(triplets_real.begin(), triplets_real.end());
+    matrix_imag.setFromTriplets(triplets_imag.begin(), triplets_imag.end());
+
+
+    //mappedBrain.writeDFS("leftMappedBrain.dfs");
+
     std::cout << "Codigo Completo" << std::endl;
 }
 
 int main() {
     SILT::DFSurface leftBrain, rightBrain;
     leftBrain.readDFS("atlas.left.mid.cortex.svreg.dfs");
-    rightBrain.readDFS("atlas.right.mid.cortex.svreg.dfs");
+    //rightBrain.readDFS("atlas.right.mid.cortex.svreg.dfs");
 
     //fixedPoints(leftBrain);
     process(leftBrain);
